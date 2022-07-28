@@ -1,0 +1,110 @@
+<mat-slide-toggle (toggleChange)="isLinear = !isLinear" id="toggle-linear">
+  {{isLinear ? 'Lineal mode activate': 'Lineal mode inactive'}}
+</mat-slide-toggle>
+
+<mat-horizontal-stepper [linear]="isLinear" #stepper>
+  <mat-step [stepControl]="firstFormGroup">
+      <ng-template matStepLabel>Principal</ng-template>
+
+      <form [formGroup]="firstFormGroup" #frmSale>
+          <mat-form-field>
+              <mat-select placeholder="Select Person" formControlName="person">
+                  <mat-option *ngFor="let p of persons" [value]="p">
+                      {{p.firstName}} {{p.lastName}}
+                  </mat-option>
+              </mat-select>
+          </mat-form-field>
+
+          &nbsp;
+
+          <mat-form-field appearance="fill">
+              <mat-label>Select a date</mat-label>
+              <input matInput [matDatepicker]="picker" [max]="maxDate" formControlName="dateTime">
+              <mat-hint>DD/MM/YYYY</mat-hint>
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+
+          <div class="list" fxLayout="row" fxLayout.xs="column" fxLayoutWrap fxLayoutGap="2%">
+            <mat-card *ngFor="let m of products" class="example-card" [ngClass]="productSelected == m ? 'productCSS': ''">
+                <mat-card-header>
+                    <img mat-card-avatar [src]="m.photoUrl" alt="Avatar of Product">
+                    <mat-card-title >
+                        {{m?.name}}
+                    </mat-card-title>
+                    <mat-card-subtitle>{{m?.brand}}</mat-card-subtitle>
+                </mat-card-header>
+                <img mat-card-image [src]="m?.photoUrl"  alt="Photo of medic" (click)="selectProduct(m)"
+                    style="cursor: pointer; object-fit: contain; width:50%; margin: 0 auto; padding: 0">
+                <mat-card-content>
+                    <p> Este es el producto con nombre {{m.name}}</p>
+                    <h2><strong>{{m?.price | currency : 'S/ '}}</strong></h2>
+                </mat-card-content>
+                <mat-card-actions>
+                    <button mat-raised-button color="primary" type="button" (click)="selectProduct(m)">SELECT</button>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+
+          <br>
+          <mat-form-field>
+              <input matInput placeholder="quantity" formControlName="quantity" type="number" min="1">
+              <small *ngIf="f['quantity'].errors?.['min'] && f['quantity'].touched" class="invalid">Min is 0</small>
+              <small *ngIf="f['quantity'].errors?.['required'] && f['quantity'].touched" class="invalid">Is required</small>
+          </mat-form-field>
+
+          &nbsp;
+          <button mat-raised-button color="primary" type="button"
+                  [disabled]="this.productSelected === undefined || f['quantity']?.value === ''"
+                  (click)="addProduct()">Add Product
+          </button>
+
+          <mat-expansion-panel *ngFor="let det of details; let i=index">
+              <mat-expansion-panel-header>
+                  <mat-panel-title>
+                      {{i + 1}} {{det?.product?.brand}}
+                  </mat-panel-title>
+                  <mat-panel-description>
+                      View Quantity
+                  </mat-panel-description>
+              </mat-expansion-panel-header>
+
+              <mat-form-field>
+                  <input matInput placeholder="Quantity" value="{{det.quantity}}">
+              </mat-form-field>
+
+              &nbsp;
+              <button mat-raised-button color="accent" (click)="removeDetail(i)">Remove</button>
+
+          </mat-expansion-panel>
+
+          <div>
+              <button mat-raised-button  (click)="nextManualStep()" type="button" color="primary"
+                  style="float: right">Next</button>
+          </div>
+      </form>
+
+  </mat-step>
+
+  <mat-step>
+      <ng-template matStepLabel>Confirm</ng-template>
+
+      <h3 *ngIf="f['person']?.value"><strong>Person:</strong> {{f['person']?.value?.firstName + ' '+ f['person']?.value?.lastName}}</h3>
+      <div class="list" fxLayout="row" fxLayout.xs="column" fxLayoutWrap fxLayoutGap="1%">
+        <h3 *ngFor="let d of details; let i = index" >
+          <strong>Product #{{i + 1}}</strong>
+          <br> - Name: {{d?.product?.name}}
+          <br> - Brand: {{d.product?.brand}}
+          <br> - Quantity: {{d?.quantity}}
+          <br> - Price: {{d?.product?.price | currency : 'S/ '}}
+          <br> - SubTotal: {{d?.product?.price * d.quantity | currency : 'S/ '}}
+        </h3>
+      </div>
+      <h3>TOTAL: {{total | currency : 'S/ '}}</h3>
+
+      <div>
+          <button mat-raised-button matStepperPrevious type="button">Previous</button>
+          <button mat-raised-button (click)="save()" color="primary">Save</button>
+      </div>
+  </mat-step>
+</mat-horizontal-stepper>

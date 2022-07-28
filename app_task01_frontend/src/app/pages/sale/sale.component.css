@@ -1,0 +1,25 @@
+.productCSS {
+  background: rgb(95, 111, 255);
+  color: white;
+}
+
+.consultCSS {
+  background: darkblue;
+  color: white;
+}
+
+#consult {
+  height: 100%;
+  width: 100%;
+  background-color: #555;
+  color: white;
+  text-align: center;
+}
+
+.list{
+  overflow: auto;
+}
+
+.invalid {
+  color: red;
+}
